@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Security Demo</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .warning { color: red; border: 2px solid red; padding: 15px; margin-bottom: 20px; }
+        .device-list { margin-top: 20px; }
+        .device-card { border: 1px solid #ddd; padding: 10px; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <div class="warning">
+        ⚠️ This is a simulation. Browsers cannot access:<br>
+        - Wi-Fi passwords<br>
+        - Passwords from other devices<br>
+        - Real device details without explicit permission
+    </div>
+
+    <h2>Your Network Security Info</h2>
+    
+    <!-- Mock Wi-Fi Password Display -->
+    <div class="device-card">
+        <h3>Your Wi-Fi Password (from router)</h3>
+        <input type="password" id="wifiPass" value="••••••••" readonly>
+        <button onclick="togglePassword()">Show/Hide</button>
+    </div>
+
+    <!-- Mock Connected Devices -->
+    <div class="device-list">
+        <h3>Connected Devices (Simulated)</h3>
+        <div id="devices"></div>
+    </div>
+
+    <script>
+        // Demo Wi-Fi password toggle
+        function togglePassword() {
+            const passField = document.getElementById('wifiPass');
+            passField.type = passField.type === 'password' ? 'text' : 'password';
+        }
+
+        // Simulated device data
+        const fakeDevices = [
+            { ip: '192.168.1.2', mac: 'AA:BB:CC:DD:EE:FF', name: 'My Phone' },
+            { ip: '192.168.1.3', mac: '11:22:33:44:55:66', name: 'Smart TV' }
+        ];
+
+        // Display simulated devices
+        function showDevices() {
+            const container = document.getElementById('devices');
+            container.innerHTML = fakeDevices.map(device => `
+                <div class="device-card">
+                    <strong>${device.name}</strong><br>
+                    IP: ${device.ip}<br>
+                    MAC: ${device.mac}<br>
+                    <em>Browser cannot access real device passwords</em>
+                </div>
+            `).join('');
+        }
+
+        // Initial load
+        showDevices();
+    </script>
+</body>
+</html>
