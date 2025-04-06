@@ -1,65 +1,109 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Network Security Demo</title>
+    <meta charset="UTF-8">
+    <title>Network Device Demo</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
-        .warning { color: red; border: 2px solid red; padding: 15px; margin-bottom: 20px; }
-        .device-list { margin-top: 20px; }
-        .device-card { border: 1px solid #ddd; padding: 10px; margin: 5px 0; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .warning {
+            background-color: #ffe6e6;
+            border: 2px solid #ff0000;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .device-card {
+            background-color: white;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #refreshBtn {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
     <div class="warning">
-        ⚠️ This is a simulation. Browsers cannot access:<br>
-        - Wi-Fi passwords<br>
-        - Passwords from other devices<br>
-        - Real device details without explicit permission
+        ⚠️ Browser Security Restriction: 
+        JavaScript cannot access other devices on your network.
+        This demo shows limited simulated/local information only.
     </div>
 
-    <h2>Your Network Security Info</h2>
+    <h1>Network Devices Demo</h1>
     
-    <!-- Mock Wi-Fi Password Display -->
+    <!-- User's Own IP -->
     <div class="device-card">
-        <h3>Your Wi-Fi Password (from router)</h3>
-        <input type="password" id="wifiPass" value="••••••••" readonly>
-        <button onclick="togglePassword()">Show/Hide</button>
+        <h3>Your Device</h3>
+        <div id="yourIp">Loading your IP...</div>
     </div>
 
-    <!-- Mock Connected Devices -->
-    <div class="device-list">
-        <h3>Connected Devices (Simulated)</h3>
-        <div id="devices"></div>
+    <!-- Simulated Devices -->
+    <div class="device-card">
+        <h3>Potential Network Devices (Simulated)</h3>
+        <button id="refreshBtn">Refresh Devices</button>
+        <div id="devicesList"></div>
     </div>
 
     <script>
-        // Demo Wi-Fi password toggle
-        function togglePassword() {
-            const passField = document.getElementById('wifiPass');
-            passField.type = passField.type === 'password' ? 'text' : 'password';
+        // Get user's local IP (WebRTC trick)
+        function getUserIP() {
+            const pc = new RTCPeerConnection({ iceServers: [] });
+            pc.createDataChannel('');
+            pc.createOffer().then(offer => pc.setLocalDescription(offer));
+            
+            pc.onicecandidate = ice => {
+                if (!ice.candidate) return;
+                const ip = ice.candidate.candidate.split(' ')[4];
+                document.getElementById('yourIp').textContent = `Local IP: ${ip}`;
+                pc.close();
+            };
         }
 
-        // Simulated device data
+        // Simulated network devices
         const fakeDevices = [
-            { ip: '192.168.1.2', mac: 'AA:BB:CC:DD:EE:FF', name: 'My Phone' },
-            { ip: '192.168.1.3', mac: '11:22:33:44:55:66', name: 'Smart TV' }
+            { ip: '192.168.1.1', type: 'Router' },
+            { ip: '192.168.1.2', type: 'Smartphone' },
+            { ip: '192.168.1.3', type: 'Printer' },
+            { ip: '192.168.1.4', type: 'IoT Device' }
         ];
 
         // Display simulated devices
         function showDevices() {
-            const container = document.getElementById('devices');
-            container.innerHTML = fakeDevices.map(device => `
-                <div class="device-card">
-                    <strong>${device.name}</strong><br>
-                    IP: ${device.ip}<br>
-                    MAC: ${device.mac}<br>
-                    <em>Browser cannot access real device passwords</em>
-                </div>
-            `).join('');
+            const list = document.getElementById('devicesList');
+            list.innerHTML = fakeDevices
+                .map(device => `
+                    <div class="device-card">
+                        <strong>${device.type}</strong><br>
+                        IP: ${device.ip}<br>
+                        Status: <span style="color:green">●</span> Online
+                    </div>
+                `).join('');
         }
 
         // Initial load
+        getUserIP();
         showDevices();
+
+        // Refresh button
+        document.getElementById('refreshBtn').addEventListener('click', () => {
+            document.querySelector('#devicesList').innerHTML = 
+                '<div style="color:#666">Rescanning network...</div>';
+            setTimeout(showDevices, 1500);
+        });
     </script>
 </body>
 </html>
